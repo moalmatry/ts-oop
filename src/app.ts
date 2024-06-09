@@ -136,6 +136,32 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   abstract renderContent(): void;
 }
 
+// Project Item Class
+
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+  private project: Project;
+
+  get persons() {
+    if (this.project.people === 1) return "1 Person";
+    else return `${this.project.people} Persons`;
+  }
+
+  constructor(hostId: string, project: Project) {
+    super("single-project", hostId, false, project.id);
+    this.project = project;
+
+    this.configure();
+    this.renderContent();
+  }
+
+  configure() {}
+  renderContent() {
+    this.element.querySelector("h2")!.textContent = this.project.title;
+    this.element.querySelector("h3")!.textContent = this.persons + " assigned";
+    this.element.querySelector("p")!.textContent = this.project.description;
+  }
+}
+
 // ProjectList Class
 
 class ProjectList extends Component<HTMLDivElement, HTMLElement> {
@@ -174,9 +200,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     )! as HTMLUListElement;
     listEl.innerHTML = "";
     for (const prjItems of this.assignedProjects) {
-      const listItem = document.createElement("li");
-      listItem.textContent = prjItems.title;
-      listEl?.appendChild(listItem);
+      new ProjectItem(this.element.querySelector("ul")!.id, prjItems);
     }
   }
 }
@@ -254,7 +278,6 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
 
       projectState.addProject(title, description, people);
 
-      console.log(title, description, people);
       this.clearInputs();
     }
   }
@@ -263,3 +286,5 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
 const prjInput = new ProjectInput();
 const activeProjectList = new ProjectList("active");
 const finishedProjectList = new ProjectList("finished");
+
+console.log("Server is Working");
